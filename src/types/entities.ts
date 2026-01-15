@@ -1,4 +1,4 @@
-import { PricingType } from "./enums";
+import { BookingStatus, PricingType } from "./enums";
 
 export interface BaseEntity {
   id: string;
@@ -75,4 +75,13 @@ export interface Availability extends BaseEntity {
   start_time: string; // HH:MM:SS
   end_time: string; // HH:MM:SS
   is_active: boolean;
+}
+
+export interface Booking extends BaseEntity {
+  item_id: string;
+  customer_name: string;
+  customer_email: string;
+  booking_time: Date;
+  duration_minutes: number;
+  status: BookingStatus;
 }

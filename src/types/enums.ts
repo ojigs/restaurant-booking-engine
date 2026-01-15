@@ -6,3 +6,9 @@ export enum PricingType {
   DISCOUNTED = "discounted",
   DYNAMIC = "dynamic",
 }
+
+// booking_status ENUM
+export enum BookingStatus {
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+}
