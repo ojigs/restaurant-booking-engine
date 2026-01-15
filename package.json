@@ -7,10 +7,10 @@
     "start": "node -r module-alias/register dist/src/server.js",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "build": "tsc --build tsconfig.json",
-    "knex": "knex --knexfile knexfile.ts",
-    "migrate": "knex migrate:latest",
-    "migrate:rollback": "knex migrate:rollback",
-    "seed": "knex seed:run",
+    "knex": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/knex/bin/cli.js --knexfile ./knexfile.ts",
+    "migrate": "npm run knex -- migrate:latest",
+    "migrate:rollback": "npm run knex -- migrate:rollback",
+    "seed": "npm run knex -- seed:run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
