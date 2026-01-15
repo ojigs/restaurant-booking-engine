@@ -8,7 +8,7 @@ export interface PaginationParams {
   order?: "asc" | "desc";
 }
 
-export interface PaginationResult<T> {
+export interface PaginatedResult<T> {
   data: T[];
   pagination: {
     page: number;
@@ -62,10 +62,10 @@ export abstract class BaseModel<T extends { id: string }> {
   }
 
   // pagination helper
-  protected async paginate(
+  protected async paginate<R = T>(
     query: Knex.QueryBuilder,
     params: PaginationParams
-  ): Promise<PaginationResult<T>> {
+  ): Promise<PaginatedResult<R>> {
     const { page, limit, sort = "created_at", order = "desc" } = params;
 
     const countQuery = query
@@ -83,7 +83,7 @@ export abstract class BaseModel<T extends { id: string }> {
       .offset((page - 1) * limit);
 
     return {
-      data,
+      data: data as R[],
       pagination: {
         page,
         limit,

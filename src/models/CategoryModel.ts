@@ -1,5 +1,5 @@
 import { Category } from "@/types/entities";
-import { BaseModel, PaginationParams, PaginationResult } from "./BaseModel";
+import { BaseModel, PaginationParams, PaginatedResult } from "./BaseModel";
 
 export interface CategoryFilters {
   is_active?: boolean;
@@ -18,7 +18,7 @@ export class CategoryModel extends BaseModel<Category> {
     restaurantId: string,
     filters: CategoryFilters,
     pagination: PaginationParams
-  ): Promise<PaginationResult<Category>> {
+  ): Promise<PaginatedResult<Category>> {
     const query = this.db(this.tableName).where({
       restaurant_id: restaurantId,
     });
