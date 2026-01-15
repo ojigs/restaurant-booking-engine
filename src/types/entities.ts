@@ -1,3 +1,5 @@
+import { PricingType } from "./enums";
+
 export interface BaseEntity {
   id: string;
   created_at: Date;
@@ -59,4 +61,10 @@ export interface ItemSearchFilters {
   categoryId?: string;
   activeOnly?: boolean;
   taxApplicable: boolean;
+}
+
+export interface Pricing extends BaseEntity {
+  item_id: string;
+  pricing_type: PricingType;
+  configuration: Record<string, any>;
 }
