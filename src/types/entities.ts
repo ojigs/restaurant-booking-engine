@@ -68,3 +68,11 @@ export interface Pricing extends BaseEntity {
   pricing_type: PricingType;
   configuration: Record<string, any>;
 }
+
+export interface Availability extends BaseEntity {
+  item_id: string;
+  day_of_week: number; // 0-6 (Sunday-Saturday)
+  start_time: string; // HH:MM:SS
+  end_time: string; // HH:MM:SS
+  is_active: boolean;
+}
