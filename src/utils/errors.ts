@@ -29,3 +29,9 @@ export class ConflictError extends AppError {
     super(message, 409);
   }
 }
+
+export class BusinessRuleError extends AppError {
+  constructor(message: string) {
+    super(message, 422);
+  }
+}
