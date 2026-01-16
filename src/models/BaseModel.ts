@@ -21,6 +21,10 @@ export interface PaginatedResult<T> {
 export abstract class BaseModel<T extends { id: string }> {
   protected abstract readonly tableName: string;
   protected readonly db: Knex = db;
+  // helper to choose between the global DB instance or a transaction
+  protected getExecutor(trx?: Knex.Transaction): Knex | Knex.Transaction {
+    return trx || this.db;
+  }
 
   /**
    * find a single record by id
@@ -55,8 +59,8 @@ export abstract class BaseModel<T extends { id: string }> {
   /**
    * soft delete (deactivate) a record by id
    */
-  async softDelete(id: string): Promise<void> {
-    await this.db(this.tableName)
+  async softDelete(id: string, trx?: Knex.Transaction): Promise<number> {
+    return this.getExecutor(trx)(this.tableName)
       .where({ id })
       .update({ is_active: false, updated_at: new Date() });
   }

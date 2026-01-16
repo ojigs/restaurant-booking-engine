@@ -1,12 +1,13 @@
 import { BaseModel, PaginatedResult, PaginationParams } from "./BaseModel";
 import { Item, ItemSearchFilters, ItemWithParents } from "@/types/entities";
 import { NotFoundError } from "@/utils/errors";
+import { Knex } from "knex";
 
 export class ItemModel extends BaseModel<Item> {
   protected readonly tableName = "items";
 
   /**
-   * fetches an item with its parent (Category or Subcategory) tax info
+   * fetches an item with its parent (Category or Subcategory) tax info.
    * this uses the XOR logic - we left join both and the resolution logic
    * handles which one to use
    */
@@ -157,5 +158,24 @@ export class ItemModel extends BaseModel<Item> {
     }
 
     return this.paginate(query, pagination);
+  }
+
+  /**
+   * deactivates all items under a specific category (directly or through subcategories)
+   * @param categoryId
+   * @param trx
+   */
+  async deactivateByParentCategory(
+    categoryId: string,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    await this.getExecutor(trx)(this.tableName)
+      .where({ category_id: categoryId })
+      .orWhereIn("subcategory_id", function () {
+        this.select("id")
+          .from("subcategories")
+          .where({ category_id: categoryId });
+      })
+      .update({ is_active: false, updated_at: new Date() });
   }
 }

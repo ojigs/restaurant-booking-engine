@@ -1,6 +1,7 @@
 import { NotFoundError } from "@/utils/errors";
 import { BaseModel, PaginatedResult, PaginationParams } from "./BaseModel";
 import { Subcategory, SubcategoryWithCategory } from "@/types/entities";
+import { Knex } from "knex";
 
 export class SubcategoryModel extends BaseModel<Subcategory> {
   protected readonly tableName = "subcategories";
@@ -69,5 +70,19 @@ export class SubcategoryModel extends BaseModel<Subcategory> {
       applicable,
       percentage: Number(percentage),
     };
+  }
+
+  /**
+   * deactivates all subcategories under a specific category
+   * @param categoryId
+   * @param trx
+   */
+  async deactivateByCategoryId(
+    categoryId: string,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    await this.getExecutor(trx)(this.tableName)
+      .where({ category_id: categoryId })
+      .update({ is_active: false, updated_at: new Date() });
   }
 }
