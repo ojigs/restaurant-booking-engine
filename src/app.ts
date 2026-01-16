@@ -1,6 +1,6 @@
 import express, { Application, Response } from "express";
 import cors from "cors";
-import { ApiResponse } from "@/types/response";
+import { ApiResponse } from "@/types/responses";
 
 const app: Application = express();
 

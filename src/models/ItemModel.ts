@@ -13,7 +13,7 @@ export interface ItemSearchFilters {
   maxPrice?: number;
   categoryId?: string;
   activeOnly?: boolean;
-  taxApplicable: boolean;
+  taxApplicable?: boolean;
 }
 
 export class ItemModel extends BaseModel<Item> {

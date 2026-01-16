@@ -1,4 +1,4 @@
-import { ApiErrorDetail } from "@/types/response";
+import { ApiErrorDetail } from "@/types/responses";
 
 export abstract class AppError extends Error {
   constructor(
