@@ -1,5 +1,5 @@
 import { NotFoundError } from "@/utils/errors";
-import { BaseModel } from "./BaseModel";
+import { BaseModel, PaginatedResult, PaginationParams } from "./BaseModel";
 import { Subcategory, SubcategoryWithCategory } from "@/types/entities";
 
 export class SubcategoryModel extends BaseModel<Subcategory> {
@@ -28,15 +28,16 @@ export class SubcategoryModel extends BaseModel<Subcategory> {
    */
   async findByCategory(
     categoryId: string,
+    pagination: PaginationParams,
     activeOnly = true
-  ): Promise<Subcategory[]> {
+  ): Promise<PaginatedResult<Subcategory>> {
     const query = this.db(this.tableName).where("category_id", categoryId);
 
     if (activeOnly) {
       query.where("is_active", true);
     }
 
-    return query.orderBy("name", "asc");
+    return this.paginate(query, pagination);
   }
 
   /**

@@ -66,7 +66,15 @@ export abstract class BaseModel<T extends { id: string }> {
     query: Knex.QueryBuilder,
     params: PaginationParams
   ): Promise<PaginatedResult<R>> {
-    const { page, limit, sort = "created_at", order = "desc" } = params;
+    const { page, limit, sort = "createdAt", order = "desc" } = params;
+
+    const sortMap: Record<string, string> = {
+      name: "name",
+      createdAt: "created_at",
+      price: "price",
+    };
+
+    const dbSortColumn = sortMap[sort] || "created_at";
 
     const countQuery = query
       .clone()
@@ -78,7 +86,7 @@ export abstract class BaseModel<T extends { id: string }> {
     const total = parseInt((countResult?.total as string) || "0", 10);
 
     const data = await query
-      .orderBy(sort, order)
+      .orderBy(dbSortColumn, order)
       .limit(limit)
       .offset((page - 1) * limit);
 

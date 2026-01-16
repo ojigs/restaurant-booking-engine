@@ -1,4 +1,4 @@
-import { BaseModel } from "./BaseModel";
+import { BaseModel, PaginatedResult, PaginationParams } from "./BaseModel";
 import { Addon, AddonGroup, AddonGroupWithAddons } from "@/types/entities";
 
 export class AddonGroupModel extends BaseModel<AddonGroup> {
@@ -29,5 +29,18 @@ export class AddonGroupModel extends BaseModel<AddonGroup> {
         .filter((addon) => addon.addon_group_id === group.id)
         .map((addon) => ({ ...addon, price: Number(addon.price) })),
     }));
+  }
+
+  /**
+   * lists all addon groups for a particular item
+   * supports pagination
+   */
+  async findAll(
+    itemId: string,
+    pagination: PaginationParams
+  ): Promise<PaginatedResult<AddonGroup>> {
+    const query = this.db(this.tableName).where("item_id", itemId);
+
+    return this.paginate(query, pagination);
   }
 }
