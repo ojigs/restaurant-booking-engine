@@ -54,15 +54,6 @@ export interface ItemWithParents extends Item {
   sub_parent_tax_percentage: number | null;
 }
 
-export interface ItemSearchFilters {
-  query?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  categoryId?: string;
-  activeOnly?: boolean;
-  taxApplicable: boolean;
-}
-
 export interface Pricing extends BaseEntity {
   item_id: string;
   pricing_type: PricingType;

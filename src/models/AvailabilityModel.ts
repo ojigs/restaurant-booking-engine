@@ -1,5 +1,6 @@
 import { BaseModel } from "./BaseModel";
 import { Availability } from "@/types/entities";
+import { Knex } from "knex";
 
 export class AvailabilityModel extends BaseModel<Availability> {
   protected readonly tableName = "availability";
@@ -73,5 +74,19 @@ export class AvailabilityModel extends BaseModel<Availability> {
 
     const overlap = await query.first();
     return !!overlap;
+  }
+
+  /**
+   * deactivates all availability rules for a specific item
+   * @param itemId
+   * @param trx
+   */
+  async deactivateByItemId(
+    itemId: string,
+    trx?: Knex.Transaction
+  ): Promise<void> {
+    await this.getExecutor(trx)(this.tableName)
+      .where({ item_id: itemId })
+      .update({ is_active: false, updated_at: new Date() });
   }
 }

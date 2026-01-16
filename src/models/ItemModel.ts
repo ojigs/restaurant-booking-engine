@@ -1,7 +1,20 @@
 import { BaseModel, PaginatedResult, PaginationParams } from "./BaseModel";
-import { Item, ItemSearchFilters, ItemWithParents } from "@/types/entities";
+import { Item, ItemWithParents } from "@/types/entities";
 import { NotFoundError } from "@/utils/errors";
 import { Knex } from "knex";
+
+export interface ItemWithPrice extends Item {
+  price: number;
+}
+
+export interface ItemSearchFilters {
+  query?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  categoryId?: string;
+  activeOnly?: boolean;
+  taxApplicable: boolean;
+}
 
 export class ItemModel extends BaseModel<Item> {
   protected readonly tableName = "items";
@@ -82,7 +95,7 @@ export class ItemModel extends BaseModel<Item> {
   async search(
     filters: ItemSearchFilters,
     pagination: PaginationParams
-  ): Promise<PaginatedResult<Item & { price: number }>> {
+  ): Promise<PaginatedResult<ItemWithPrice>> {
     const query = this.db(this.tableName)
       .select(
         "items.*",

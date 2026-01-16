@@ -37,16 +37,22 @@ export abstract class BaseModel<T extends { id: string }> {
   /**
    * create a new record
    */
-  async create(data: Partial<T>): Promise<T> {
-    const [record] = await this.db(this.tableName).insert(data).returning("*");
+  async create(data: Partial<T>, trx?: Knex.Transaction): Promise<T> {
+    const [record] = await this.getExecutor(trx)(this.tableName)
+      .insert(data)
+      .returning("*");
     return record;
   }
 
   /**
    * update a record by id
    */
-  async update(id: string, data: Partial<T>): Promise<T> {
-    const [record] = await this.db(this.tableName)
+  async update(
+    id: string,
+    data: Partial<T>,
+    trx?: Knex.Transaction
+  ): Promise<T> {
+    const [record] = await this.getExecutor(trx)(this.tableName)
       .where({ id })
       .update({
         ...data,

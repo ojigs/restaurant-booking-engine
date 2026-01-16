@@ -88,4 +88,5 @@ export const itemSearchSchema = z.object({
 });
 
 export type CreateItemDTO = z.infer<typeof createItemSchema>;
+export type UpdateItemDTO = z.infer<typeof updateItemSchema>;
 export type ItemSearchDTO = z.infer<typeof itemSearchSchema>;
