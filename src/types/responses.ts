@@ -12,8 +12,8 @@ export interface ApiErrorResponse {
   success: false;
   error: {
     message: string;
-    code?: number;
-    details: ApiErrorDetail[];
+    code?: string;
+    details?: ApiErrorDetail[];
     stack?: string;
   };
 }
