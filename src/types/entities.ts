@@ -85,3 +85,25 @@ export interface Booking extends BaseEntity {
   duration_minutes: number;
   status: BookingStatus;
 }
+
+export interface AddonGroup extends BaseEntity {
+  item_id: string;
+  name: string;
+  is_required: boolean;
+  min_selection: number;
+  max_selection: number;
+}
+
+export interface Addon extends BaseEntity {
+  addon_group_id: string;
+  name: string;
+  price: number;
+  is_active: boolean;
+}
+
+/**
+ *  interface for API responses where we need the full list of addons under each group
+ */
+export interface AddonGroupWithAddons extends AddonGroup {
+  addons: Addon[];
+}
