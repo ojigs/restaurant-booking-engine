@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { AppError, ValidationError } from "@/utils/errors";
 import { ApiErrorResponse } from "@/types/responses";
 import { config } from "@/config/env";
@@ -7,7 +7,7 @@ import { config } from "@/config/env";
  * Global Error Handler
  * Ensures all errors follow the ApiErrorResponse interface.
  */
-export const errorHandler = (
+export const errorHandler: ErrorRequestHandler = (
   err: Error,
   req: Request,
   res: Response,

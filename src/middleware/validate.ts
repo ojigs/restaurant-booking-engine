@@ -5,13 +5,28 @@ import { ValidationError } from "@/utils/errors";
 /**
  * reusable middleware to validate request body against a Zod schema
  */
-export const validate = (schema: ZodType<any>) => {
+export const validate = (
+  schema: ZodType,
+  source: "body" | "query" | "params" = "body"
+) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       // parseAsync handles both sync and async operations (like DB checks)
-      const validatedBody = await schema.parseAsync(req.body);
+      const validatedData = await schema.parseAsync(req[source]);
 
-      req.body = validatedBody;
+      if (source === "body") {
+        req[source] = validatedData;
+      } else {
+        // update req.query or req.params in place
+        const target = req[source];
+
+        Object.keys(target).forEach((key) => {
+          delete (target as any)[key];
+        });
+
+        Object.assign(target, validatedData);
+      }
+
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -21,7 +36,9 @@ export const validate = (schema: ZodType<any>) => {
           message: err.message,
         }));
 
-        return next(new ValidationError("Validation failed", details));
+        return next(
+          new ValidationError(`${source} validation failed`, details)
+        );
       }
       next(error);
     }

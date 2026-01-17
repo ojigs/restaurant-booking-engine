@@ -67,6 +67,20 @@ export class ItemController extends BaseController {
     return this.success(res, result);
   }
 
+  /**
+   * PUT /items/:id
+   * Updates item data
+   */
+  async update(req: Request<{ id: string }>, res: Response): Promise<Response> {
+    const { id } = req.params;
+    const updatedItem = await this.itemService.update(id, req.body);
+    return this.success(res, updatedItem);
+  }
+
+  /**
+   * DELETE /items/:id
+   * SOFT DELETE an item
+   */
   async delete(req: Request<{ id: string }>, res: Response): Promise<Response> {
     await this.itemService.delete(req.params.id);
     return this.noContent(res);

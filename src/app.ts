@@ -1,6 +1,8 @@
 import express, { Application, Response } from "express";
 import cors from "cors";
 import { ApiResponse } from "@/types/responses";
+import routes from "@/routes";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app: Application = express();
 
@@ -18,5 +20,11 @@ app.get("/health", (_, res: Response) => {
   };
   res.status(200).json(response);
 });
+
+// API Routes
+app.use("/api/v1", routes);
+
+// global error handler
+app.use(errorHandler);
 
 export default app;
