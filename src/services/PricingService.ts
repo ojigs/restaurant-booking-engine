@@ -10,7 +10,12 @@ import {
   PriceResult,
   TaxResult,
 } from "@/types/pricing";
-import { BusinessRuleError, NotFoundError } from "@/utils/errors";
+import {
+  BusinessRuleError,
+  NotFoundError,
+  ValidationError,
+} from "@/utils/errors";
+import { Knex } from "knex";
 
 export class PricingService {
   /**
@@ -34,10 +39,11 @@ export class PricingService {
 
   async calculatePrice(
     itemId: string,
-    params: PriceCalculationParams = {}
+    params: PriceCalculationParams = {},
+    trx?: Knex.Transaction
   ): Promise<PriceResult> {
     // get the price configuration
-    const pricing = await this.pricingModel.findByItem(itemId);
+    const pricing = await this.pricingModel.findByItem(itemId, trx);
     if (!pricing) {
       throw new NotFoundError(
         `Pricing configuration not found for item ID: ${itemId}`
@@ -57,7 +63,7 @@ export class PricingService {
     const priceDetails = strategy.calculate(params);
 
     // get the effective tax across the item, subcategory, category
-    const taxInfo = await this.itemModel.getEffectiveTax(itemId);
+    const taxInfo = await this.itemModel.getEffectiveTax(itemId, trx);
 
     let taxAmount = 0;
     if (taxInfo.applicable && priceDetails.finalPrice > 0) {
@@ -77,5 +83,30 @@ export class PricingService {
       tax: taxResult,
       grandTotal: priceDetails.finalPrice + taxAmount,
     };
+  }
+
+  /**
+   * validates a pricing configuration against its strategy rules
+   */
+  validateConfiguration(type: PricingType, configuration: any): void {
+    const StrategyClass = this.strategyMap[type];
+
+    if (!StrategyClass) {
+      throw new BusinessRuleError(
+        `Pricing strategy '${type}' is not supported.`
+      );
+    }
+
+    const strategy = new StrategyClass(configuration);
+    const result = strategy.validate();
+
+    if (!result.isValid) {
+      const details = result.errors.map((msg) => ({
+        field: "pricing.configuration",
+        message: msg,
+      }));
+
+      throw new ValidationError("Invalid pricing configuration", details);
+    }
   }
 }

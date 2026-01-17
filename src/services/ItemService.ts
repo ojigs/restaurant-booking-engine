@@ -11,7 +11,7 @@ import { AvailabilityModel } from "@/models/AvailabilityModel";
 import { Item } from "@/types/entities";
 import { CreateItemDTO, UpdateItemDTO, CreatePricingDTO } from "@/validators";
 import { PaginationParams, PaginatedResult } from "@/models/BaseModel";
-import { NotFoundError } from "@/utils/errors";
+import { BusinessRuleError, NotFoundError } from "@/utils/errors";
 import { PriceResult } from "@/types/pricing";
 
 export class ItemService {
@@ -28,12 +28,20 @@ export class ItemService {
   async create(
     itemData: CreateItemDTO,
     pricingData: Omit<CreatePricingDTO, "item_id">
-  ): Promise<Item & { pricing: PriceResult }> {
+  ): Promise<Item & { pricing: PriceResult | null }> {
+    // validate pricing configuration before proceeding
+    this.pricingService.validateConfiguration(
+      pricingData.pricing_type,
+      pricingData.configuration
+    );
+
     return db.transaction(async (trx: Knex.Transaction) => {
       const item = await this.itemModel.create(itemData, trx);
 
+      console.log("pricing data:", pricingData);
+
       // create the pricing configuration
-      await this.pricingModel.create(
+      const newPricing = await this.pricingModel.create(
         {
           item_id: item.id,
           pricing_type: pricingData.pricing_type,
@@ -42,10 +50,25 @@ export class ItemService {
         trx
       );
 
-      // since price is not stored, we compute initial price to return along with item
-      const pricing = await this.pricingService.calculatePrice(item.id);
+      console.log("new pricing created:", newPricing);
 
-      return { ...item, pricing };
+      // since price is not stored, we compute initial price to return along with item
+      try {
+        const pricing = await this.pricingService.calculatePrice(
+          item.id,
+          {},
+          trx
+        );
+        return { ...item, pricing };
+      } catch (error) {
+        // edge case: if the error is a BusinessRuleError (e.g "Item not available now"),
+        // we still want the item to be created. We just return pricing as null
+        if (error instanceof BusinessRuleError) {
+          return { ...item, pricing: null };
+        }
+        // if its a different error (like a DB crash), throw and rollback
+        throw error;
+      }
     });
   }
 

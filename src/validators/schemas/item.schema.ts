@@ -1,13 +1,14 @@
 import z from "zod";
+import { itemPricingSchema } from "./pricing.schema";
 
 const itemCore = {
   name: z.string().min(1, "Name is required").max(150),
   description: z.string().max(1000).nullable().optional(),
-  image: z.string().url().nullable().optional(),
+  image: z.url().nullable().optional(),
   tax_applicable: z.boolean().nullable().default(null),
   tax_percentage: z.number().min(0).max(100).nullable().optional(),
   is_bookable: z.boolean().default(false),
-  category_id: z.string().uuid("Invalid category ID").nullable().optional(),
+  category_id: z.uuid("Invalid category ID").nullable().optional(),
   subcategory_id: z
     .string()
     .uuid("Invalid subcategory ID")
@@ -16,7 +17,7 @@ const itemCore = {
 };
 
 export const createItemSchema = z
-  .object(itemCore)
+  .object({ ...itemCore, pricing: itemPricingSchema })
   .refine(
     (data) => {
       // item must have at least one parent (category or subcategory) but not both
@@ -73,7 +74,7 @@ export const itemSearchSchema = z.object({
   query: z.string().optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryId: z.uuid().optional(),
   activeOnly: z.preprocess((val) => val === "true", z.boolean()).optional(),
 
   taxApplicable: z.preprocess((val) => {

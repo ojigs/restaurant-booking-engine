@@ -40,21 +40,39 @@ const dynamicConfig = z.object({
  */
 export const createPricingSchema = z.discriminatedUnion("pricing_type", [
   z.object({
-    item_id: z.string().uuid(),
+    item_id: z.uuid(),
     pricing_type: z.literal(PricingType.STATIC),
     configuration: staticConfig,
   }),
   z.object({
-    item_id: z.string().uuid(),
+    item_id: z.uuid(),
     pricing_type: z.literal(PricingType.TIERED),
     configuration: tieredConfig,
   }),
   z.object({
-    item_id: z.string().uuid(),
+    item_id: z.uuid(),
     pricing_type: z.literal(PricingType.DYNAMIC),
     configuration: dynamicConfig,
   }),
   // complimentary and discounted pricing types can be added here in future
+]);
+
+/**
+ * input schema used inside item creation
+ */
+export const itemPricingSchema = z.discriminatedUnion("pricing_type", [
+  z.object({
+    pricing_type: z.literal(PricingType.STATIC),
+    configuration: staticConfig,
+  }),
+  z.object({
+    pricing_type: z.literal(PricingType.TIERED),
+    configuration: tieredConfig,
+  }),
+  z.object({
+    pricing_type: z.literal(PricingType.DYNAMIC),
+    configuration: dynamicConfig,
+  }),
 ]);
 
 export type CreatePricingDTO = z.infer<typeof createPricingSchema>;

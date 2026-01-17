@@ -2,6 +2,7 @@ import { Router } from "express";
 import { bookingController } from "@/config/registry";
 import { validate } from "@/middleware/validate";
 import { createBookingSchema } from "@/validators";
+import { itemIdParamSchema } from "@/validators/schemas/common.schema";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
  */
 router.get(
   "/slots/:itemId",
+  validate(itemIdParamSchema, "params"), // validate itemId param
   bookingController.getSlots.bind(bookingController)
 );
 

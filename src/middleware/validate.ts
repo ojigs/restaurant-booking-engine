@@ -5,8 +5,11 @@ import { ValidationError } from "@/utils/errors";
 /**
  * reusable middleware to validate request body against a Zod schema
  */
-export const validate = (
-  schema: ZodType,
+export const validate: (
+  schema: ZodType<any>,
+  source?: "body" | "query" | "params"
+) => (req: Request, _res: Response, next: NextFunction) => Promise<void> = (
+  schema: ZodType<any>,
   source: "body" | "query" | "params" = "body"
 ) => {
   return async (req: Request, _res: Response, next: NextFunction) => {

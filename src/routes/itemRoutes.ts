@@ -6,6 +6,7 @@ import {
   updateItemSchema,
   itemSearchSchema,
 } from "@/validators";
+import { idParamSchema } from "@/validators/schemas/common.schema";
 
 const router = Router();
 
@@ -32,17 +33,26 @@ router.post(
  * GET /api/v1/items/:id/details
  * fetches item with computed price and tax breakdown
  */
-router.get("/:id/details", itemController.getDetails.bind(itemController));
+router.get(
+  "/:id/details",
+  validate(idParamSchema, "params"),
+  itemController.getDetails.bind(itemController)
+);
 
 /**
  * PUT /api/v1/items/:id
  */
 router.put(
   "/:id",
+  validate(idParamSchema, "params"),
   validate(updateItemSchema),
   itemController.update.bind(itemController)
 );
 
-router.delete("/:id", itemController.delete.bind(itemController));
+router.delete(
+  "/:id",
+  validate(idParamSchema, "params"),
+  itemController.delete.bind(itemController)
+);
 
 export default router;

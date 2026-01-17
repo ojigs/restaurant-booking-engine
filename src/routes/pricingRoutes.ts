@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { pricingController } from "@/config/registry";
+import { validate } from "@/middleware/validate";
+import { idParamSchema } from "@/validators/schemas/common.schema";
 
 const router = Router();
 
@@ -11,6 +13,10 @@ const router = Router();
  * It allows the user to see the Grand Total (with tax) before
  * they hit the 'book' button
  */
-router.get("/item/:id", pricingController.getQuote.bind(pricingController));
+router.get(
+  "/item/:id",
+  validate(idParamSchema, "params"),
+  pricingController.getQuote.bind(pricingController)
+);
 
 export default router;

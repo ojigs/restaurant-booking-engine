@@ -1,6 +1,7 @@
 import { PricingType } from "@/types/enums";
 import { BaseModel } from "./BaseModel";
 import { Pricing } from "@/types/entities";
+import { Knex } from "knex";
 
 export class PricingModel extends BaseModel<Pricing> {
   protected readonly tableName = "pricing";
@@ -11,10 +12,15 @@ export class PricingModel extends BaseModel<Pricing> {
    * @param itemId - uuid of the item
    * @returns pricing configuration or null if not defined
    */
-  async findByItem(itemId: string): Promise<Pricing | null> {
-    const row = await this.db(this.tableName)
+  async findByItem(
+    itemId: string,
+    trx?: Knex.Transaction
+  ): Promise<Pricing | null> {
+    const row = await this.getExecutor(trx)(this.tableName)
       .where({ item_id: itemId })
       .first();
+
+    console.log("pricing row fetched for item:", itemId, row);
 
     return row ? this.mapToEntity(row) : null;
   }

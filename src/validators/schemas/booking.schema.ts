@@ -1,12 +1,10 @@
 import z from "zod";
 
 export const createBookingSchema = z.object({
-  item_id: z.string().uuid("Invalid item ID"),
-  booking_time: z.coerce
-    .date()
-    .refine((date) => date > new Date(), {
-      message: "Booking time must be in the future",
-    }),
+  item_id: z.uuid("Invalid item ID"),
+  booking_time: z.coerce.date().refine((date) => date > new Date(), {
+    message: "Booking time must be in the future",
+  }),
   duration_minutes: z
     .number()
     .int()

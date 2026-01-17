@@ -24,8 +24,11 @@ export class ItemModel extends BaseModel<Item> {
    * this uses the XOR logic - we left join both and the resolution logic
    * handles which one to use
    */
-  async findWithParents(id: string): Promise<ItemWithParents | null> {
-    const row = await this.db(this.tableName)
+  async findWithParents(
+    id: string,
+    trx?: Knex.Transaction
+  ): Promise<ItemWithParents | null> {
+    const row = await this.getExecutor(trx)(this.tableName)
       .select(
         "items.*",
         "categories.tax_applicable as category_tax_applicable",
@@ -53,9 +56,10 @@ export class ItemModel extends BaseModel<Item> {
    * reolves the effective tax for an item by checking item, subcategory, and category levels
    */
   async getEffectiveTax(
-    id: string
+    id: string,
+    trx?: Knex.Transaction
   ): Promise<{ applicable: boolean; percentage: number }> {
-    const item = await this.findWithParents(id);
+    const item = await this.findWithParents(id, trx);
     if (!item) throw new NotFoundError("Item");
 
     // check item level

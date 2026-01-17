@@ -2,6 +2,7 @@ import { Router } from "express";
 import { categoryController } from "@/config/registry";
 import { validate } from "@/middleware/validate";
 import { createCategorySchema, updateCategorySchema } from "@/validators";
+import { idParamSchema } from "@/validators/schemas/common.schema";
 
 const router = Router();
 
@@ -29,7 +30,11 @@ router.get(
  * GET /api/v1/categories/:id
  * Fetches a single category by id
  */
-router.get("/:id", categoryController.getById.bind(categoryController));
+router.get(
+  "/:id",
+  validate(idParamSchema, "params"),
+  categoryController.getById.bind(categoryController)
+);
 
 /**
  * PUT /api/v1/categories/:id
@@ -37,6 +42,7 @@ router.get("/:id", categoryController.getById.bind(categoryController));
  */
 router.put(
   "/:id",
+  validate(idParamSchema, "params"),
   validate(updateCategorySchema),
   categoryController.update.bind(categoryController)
 );

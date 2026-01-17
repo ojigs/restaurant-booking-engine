@@ -15,6 +15,8 @@ export class ItemController extends BaseController {
    */
   async create(req: Request, res: Response): Promise<Response> {
     const { pricing, ...itemData } = req.body;
+
+    console.log("pricing request body:", req.body);
     const result = await this.itemService.create(itemData, pricing);
     return this.created(res, result);
   }
