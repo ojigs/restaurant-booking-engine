@@ -103,9 +103,9 @@ export class ItemModel extends BaseModel<Item> {
         this.db.raw(
           `CAST(
             COALESCE(
-              pricing.configuration->>'base_price',
-              pricing.configuration->'tiers'->0->>'price',
-              pricing.configuration->'time_slots'->0->>'price'
+              pricing.configuration->>'base_price', -- static price
+              pricing.configuration->'tiers'->0->>'price', -- first tier price
+              pricing.configuration->'time_slots'->0->>'price' -- first time slot price
             ) AS DECIMAL
           ) as price`
         )
