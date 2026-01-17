@@ -99,9 +99,15 @@ export class ItemModel extends BaseModel<Item> {
     const query = this.db(this.tableName)
       .select(
         "items.*",
-        // extract base_price from JSONB as a numeric value
+        // extract price from JSONB as a numeric value
         this.db.raw(
-          "CAST(pricing.configuration->>'base_price' AS DECIMAL) as price"
+          `CAST(
+            COALESCE(
+              pricing.configuration->>'base_price',
+              pricing.configuration->'tiers'->0->>'price',
+              pricing.configuration->'time_slots'->0->>'price'
+            ) AS DECIMAL
+          ) as price`
         )
       )
       .leftJoin("pricing", "items.id", "pricing.item_id")
