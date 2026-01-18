@@ -185,3 +185,37 @@ npm test
 3. Complex add-on constraints — I implemented add-ons basics but omitted detailed validation in favour of the core features.
 
 ---
+
+## Future Improvements & Refactors
+
+If I had more time to take this from a solid engine to a global production-scale product, these are the areas I would prioritize:
+
+### 1. Caching
+
+Currently, the system calculates the 3-tier tax inheritance and pricing strategy every time an item is requested. While this ensures accuracy, it hits the database frequently.
+
+- **Improvement**: I would implement a caching layer (like Redis). When a Category tax changes, I would use a "Cache Invalidation" pattern to clear only the affected items. This would allow the system to handle thousands of requests per second with sub-millisecond response times.
+
+### 2. Capacity Management
+
+Right now, the booking system assumes a "one-to-one" relationship (one booking fills the item).
+
+- **Improvement**: I would refactor the `Availability` and `Booking` models to support **Capacity**. For a restaurant with 20 tables, the system should only show a slot as "Full" when all 20 tables are booked. This would involve using SQL `SUM` functions inside our transactional locks to ensure we never overbook.
+
+### 3. Global Timezone Support
+
+The current version assumes the server and the restaurant are in the same location.
+
+- **Improvement**: I would refactor the database to store a `timezone` string for every restaurant. I would then use a library like `date-fns-tz` to ensure that a customer booking from London sees the correct local time for a restaurant in Dubai, preventing "off-by-one-hour" errors during Daylight Savings transitions.
+
+### 4. Audit Trail Logging
+
+In a real business, knowing _who_ changed a price is as important as the price itself.
+
+- **Improvement**: I would implement an `audit_logs` table. Every time a `PricingStrategy` configuration is updated or a booking is cancelled, the system would record the old value, the new value, and the user who made the change. This is essential for financial accountability and troubleshooting.
+
+### 6. Expanded Test Coverage
+
+While I have covered the core pricing math with Unit Tests, the "wiring" (the Controllers and Routes) is currently verified manually.
+
+- **Improvement**: I would add **Integration Tests** using `supertest`. This would simulate actual HTTP requests to ensure that the Zod validation, the Service logic, and the Database transactions all work together perfectly under various failure scenarios.

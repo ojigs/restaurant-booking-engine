@@ -27,7 +27,11 @@ export class BookingService {
     dateStr: string,
     durationMinutes: number = 60
   ): Promise<AvailableSlot[]> {
+    console.log("Checking availability for item:", itemId, "on date:", dateStr);
     const item = await this.itemModel.findById(itemId);
+
+    console.log("Item fetched for availability:", item);
+
     if (!item || !item.is_bookable || !item.is_active) {
       throw new BusinessRuleError("Item is not available for booking");
     }
